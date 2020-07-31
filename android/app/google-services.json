@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "792806649708",
+    "firebase_url": "https://videocall-test-3rdwheel.firebaseio.com",
+    "project_id": "videocall-test-3rdwheel",
+    "storage_bucket": "videocall-test-3rdwheel.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:792806649708:android:8377c15702e4fe61858d49",
+        "android_client_info": {
+          "package_name": "tylerliu.videocall_test_3rdwheel"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "792806649708-c0irj3er1m70h2qhj6keg2jh7a6rhcos.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "tylerliu.videocall_test_3rdwheel",
+            "certificate_hash": "2403509c44884a1000c0e2ad89f39200578113a0"
+          }
+        },
+        {
+          "client_id": "792806649708-t3s8ehst6oejvidt1utvmevchsg6db43.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJ7-mtoRcRDdc4mfCRzvn-TeyjYr8FxDI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "792806649708-t3s8ehst6oejvidt1utvmevchsg6db43.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "792806649708-d2c5i6miqn9pohuteso8vpp63g482noh.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "tylerliu.videocallTest3rdwheel"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
