@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:videocall_test_3rdwheel/screens/pageviews/chat_list_screen.dart';
 import 'package:videocall_test_3rdwheel/utils/universal_variables.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -34,7 +35,9 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: UniversalVariables.blackColor,
       body: PageView(
         children: <Widget>[
-          Center(child: Text("Chat List Screen")),
+          Container(
+            child: ChatListScreen(),
+          ),
           Center(child: Text("Call Logs")),
           Center(child: Text("Contact Screen")),
         ],
