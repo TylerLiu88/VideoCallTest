@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:videocall_test_3rdwheel/resources/firebase_repository.dart';
 import 'package:videocall_test_3rdwheel/screens/home_screen.dart';
 import 'package:videocall_test_3rdwheel/screens/login_screen.dart';
+import 'package:videocall_test_3rdwheel/screens/search_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -21,6 +22,10 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       title: "VideoCall",
       debugShowMaterialGrid: false,
+      initialRoute: "/", //This main.dart is our first page
+      routes: {
+        'search_screen': (context) => searchScreen(),
+      },
       home: FutureBuilder(
         future: _repository.getCurrentUser(),
         builder: (context, AsyncSnapshot<FirebaseUser> snapshot) {

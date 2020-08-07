@@ -3,12 +3,14 @@ import "package:firebase_auth/firebase_auth.dart";
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:videocall_test_3rdwheel/models/user.dart';
 import 'package:videocall_test_3rdwheel/utils/utilities.dart';
+import 'package:flutter/material.dart';
 
 class FirebaseMethods {
   /*
     User Authentication
    */
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
   //Sign in with google
   GoogleSignIn _googleSignIn = GoogleSignIn();
 
@@ -26,7 +28,7 @@ class FirebaseMethods {
     GoogleSignInAccount _signInAccount = await _googleSignIn.signIn();
     //Google Authentication
     GoogleSignInAuthentication _signInAuthentication =
-        await _signInAccount.authentication;
+    await _signInAccount.authentication;
 
     final AuthCredential credential = GoogleAuthProvider.getCredential(
         idToken: _signInAuthentication.idToken,
@@ -64,6 +66,7 @@ class FirebaseMethods {
         .document(currentUser.uid)
         .setData(user.toMap(user));
   }
+
   //Allow user to sign out of their accounts
 
   Future<void> signOut() async {
@@ -71,4 +74,25 @@ class FirebaseMethods {
     await _googleSignIn.signOut();
     return await _auth.signOut();
   }
+
+
+  //Create a list of all users for searching
+  Future<List<User>> fetchAllUsers(FirebaseUser currentUser) async {
+    List<User> userList = List<User>();
+
+    QuerySnapshot querySnapshot = await firestore.collection("users").getDocuments();
+
+    for (var i = 0; i < querySnapshot.documents.length; i++){
+
+      //Prevent user from finding themselves
+      if(querySnapshot.documents[i].documentID != user.uid){
+        userList.add(User.fromMap(querySnapshot.documents[i].data));
+
+      }
+    }
+  return userList;
+
+  }
+
 }
+

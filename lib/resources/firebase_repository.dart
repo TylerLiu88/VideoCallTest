@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_methods.dart';
+import 'package:videocall_test_3rdwheel/models/user.dart';
 
 class FirebaseRepository {
   FirebaseMethods _firebaseMethods = FirebaseMethods();
@@ -18,4 +19,8 @@ class FirebaseRepository {
       _firebaseMethods.addDataToDb(user);
   //Sign out
   Future<void> signOut() => _firebaseMethods.signOut();
+
+  //Fetch all users
+  Future<List<User>> fetchAllUsers(FirebaseUser user) =>
+      _firebaseMethods.fetchAllUsers(user);
 }
