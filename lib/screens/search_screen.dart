@@ -6,6 +6,8 @@ import 'package:videocall_test_3rdwheel/resources/firebase_repository.dart';
 import 'package:videocall_test_3rdwheel/utils/universal_variables.dart';
 import 'package:videocall_test_3rdwheel/widgets/custom_tile.dart';
 
+import 'chatscreens/chat_screen.dart';
+
 class searchScreen extends StatefulWidget {
   @override
   _searchScreenState createState() => _searchScreenState();
@@ -137,7 +139,15 @@ class _searchScreenState extends State<searchScreen> {
         );
         return CustomTile(
           mini: false,
-          onTap: () {},
+          onTap: () {
+            //Push user to the chat screen
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ChatScreen(
+                          receiver: searchedUser,
+                        )));
+          },
           leading: CircleAvatar(
             backgroundImage: NetworkImage(searchedUser.profilePhoto),
             backgroundColor: Colors.grey,
