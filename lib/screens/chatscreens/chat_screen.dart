@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:videocall_test_3rdwheel/models/message.dart';
 import 'package:videocall_test_3rdwheel/models/user.dart';
+import 'package:videocall_test_3rdwheel/resources/firebase_repository.dart';
 import 'package:videocall_test_3rdwheel/utils/universal_variables.dart';
 import 'package:videocall_test_3rdwheel/widgets/appbar.dart';
 import 'package:videocall_test_3rdwheel/widgets/custom_tile.dart';
@@ -21,6 +24,27 @@ class _ChatScreenState extends State<ChatScreen> {
   TextEditingController textFieldController = TextEditingController();
   bool isWriting = false;
 
+  FirebaseRepository _repository = FirebaseRepository();
+  User sender;
+
+  String _currentUserId;
+
+  //Initialize user's data
+  @override
+  void initState() {
+    super.initState();
+    _repository.getCurrentUser().then((user) {
+      _currentUserId = user.uid;
+      setState(() {
+        sender = User(
+          uid: user.uid,
+          name: user.displayName,
+          profilePhoto: user.photoUrl,
+        );
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,26 +65,46 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Widget messageList() {
-    return ListView.builder(
-      padding: EdgeInsets.all(10),
-      itemCount: 6,
-      itemBuilder: (context, index) {
-        return chatMessageItem();
+    return StreamBuilder(
+      stream: Firestore.instance
+          .collection("messages")
+          .document(_currentUserId)
+          .collection(widget.receiver.uid)
+          .orderBy("timestamp", descending: true)
+          .snapshots(),
+      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        //Show indicator is snapshot has no data
+        if (snapshot.data == null) {
+          return Center(child: CircularProgressIndicator());
+        }
+        return ListView.builder(
+          padding: EdgeInsets.all(10),
+          itemCount: snapshot.data.documents.length,
+          itemBuilder: (context, index) {
+            return chatMessageItem(snapshot.data.documents[index]);
+          },
+        );
       },
     );
   }
 
-  Widget chatMessageItem() {
+  Widget chatMessageItem(DocumentSnapshot snapshot) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 15),
       child: Container(
-        alignment: Alignment.centerRight,
-        child: senderLayout(),
+        //Depending on who sent message, the chat bubble will adjust its alignment
+        alignment: snapshot['senderId'] == _currentUserId
+            ? Alignment.centerRight
+            : Alignment.centerLeft,
+        //Adjust the layout of messages based on who sent what
+        child: snapshot['senderId'] == _currentUserId
+            ? senderLayout(snapshot)
+            : receiverLayout(snapshot),
       ),
     );
   }
 
-  Widget senderLayout() {
+  Widget senderLayout(DocumentSnapshot snapshot) {
     Radius messageRadius = Radius.circular(10);
 
     return Container(
@@ -77,15 +121,12 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
       child: Padding(
         padding: EdgeInsets.all(10),
-        child: Text(
-          "Hello",
-          style: TextStyle(color: Colors.white, fontSize: 16),
-        ),
+        child: getMessage(snapshot),
       ),
     );
   }
 
-  Widget receiverLayout() {
+  Widget receiverLayout(DocumentSnapshot snapshot) {
     Radius messageRadius = Radius.circular(10);
 
     return Container(
@@ -102,10 +143,23 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
       child: Padding(
         padding: EdgeInsets.all(10),
-        child: Text(
-          "Hello",
-          style: TextStyle(color: Colors.white, fontSize: 16),
-        ),
+        child: getMessage(snapshot),
+      ),
+    );
+  }
+
+  //Generates the message from database into text for user to visually see
+  getMessage(DocumentSnapshot snapshot) {
+    /*
+    Snapshot is essentially a map with keys that are linked to different parts
+    of the database. Using specific keys will access different parts in tha DB.
+    In this case, the snapshot map is modeled by the message.dart model.
+     */
+    return Text(
+      snapshot['message'],
+      style: TextStyle(
+        color: Colors.white,
+        fontSize: 16.0,
       ),
     );
   }
@@ -116,6 +170,26 @@ class _ChatScreenState extends State<ChatScreen> {
       setState(() {
         isWriting = val;
       });
+    }
+
+    /*
+    Send message function
+     */
+    sendMessage() {
+      //Get the most recent string of words/text
+      var text = textFieldController.text;
+      Message _message = Message(
+          receiverId: widget.receiver.uid,
+          senderId: sender.uid,
+          message: text,
+          timeStamp: FieldValue.serverTimestamp(),
+          type: 'text');
+      //Close text
+      setState(() {
+        isWriting = false;
+      });
+
+      _repository.addMessageToDb(_message, sender, widget.receiver);
     }
 
     addMediaModal(context) {
@@ -243,7 +317,9 @@ class _ChatScreenState extends State<ChatScreen> {
                       Icons.send,
                       size: 15,
                     ),
-                    onPressed: () => {},
+
+                    //Send message to user
+                    onPressed: () => sendMessage(),
                   ))
               : Container(),
         ],
